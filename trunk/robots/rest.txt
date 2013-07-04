@@ -1,0 +1,31 @@
+(defn update-fact-rest [hechos]
+  (println "Facts a insertar : " hechos)
+  (def stringHechos (apply str hechos))
+  (println "Facts in string form :" stringHechos)
+  (render "Resultado: {{resultado}}" {:resultado (apply str(facts stringHechos))}))
+
+;(defn insert-rule-rest [regla]
+;  (println "Rule a insertar : " regla)
+;  (def stringRegla (apply str regla))
+;  (println "Rule in string form :" stringRegla)
+;  ;(render "Resultado: "))
+;  (rule regla " asdasd " )
+;  (render "Regla creada: {resultado}"))
+
+(defn check-rule-rest [testing]
+  (println "Regla A Chequear : " testing)
+  ;text =(facts rojo es rojo violeta es verde)
+  (def stringTesting (apply str testing))
+  (render "Resultado: {{resultado}}" {:resultado (apply str((ns-resolve 'mimir.well (symbol stringTesting))))}))
+ 
+; Routes
+(defroutes main-routes
+  (GET "/" [ruleTesting]
+       (println "Rule params:" [ruleTesting])
+       (check-rule-rest [ruleTesting]))
+  (PUT "/fact" [facts]
+       (println "Facts params:" [facts])
+       (update-fact-rest [facts])))
+;  (POST "/rule" [newRule]
+;       (println "Rule adding params:" [newRule])
+;       (insert-rule-rest [newRule])))
