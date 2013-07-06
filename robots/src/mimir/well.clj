@@ -24,7 +24,7 @@
 
 (def ^:dynamic *net* (atom (create-net)))
 
-(defn dbg [x] (println x) x)
+(defn dbg [& x] (println x) x)
 
 
  (doseq [k (keys @*net*)]
@@ -134,17 +134,17 @@
                 ([] (~name {}))
                 ([{:syms ~(vec (vars lhs)) :as ~'args}] (~name (working-memory) ~'args))
                 ([~'wm ~'args]
-                   (debug "rule" '~name '~*ns*)
+                   (dbg "rule" '~name '~*ns*)
                    (for [vars# (check-rule '~(vec expanded-lhs) ~'wm ~'args)
                          :let [{:syms ~(vec (concat (all-vars lhs) (vars lhs)))} vars#
                                ~'*matches* (map val (sort-by key (dissoc (purge-match-vars vars#) '~@binding-vars)))]]
                      (do
-                       (debug "rhs" vars#)
+                       (dbg "rhs" vars#)
                        ~@rhs))))]
-       (debug "defining rule" '~name)
+       (dbg "defining rule" '~name)
        (when-not (= '~lhs '~expanded-lhs)
-         (debug "expanded" '~lhs)
-         (debug "    into" '~expanded-lhs))
+         (dbg "expanded" '~lhs)
+         (dbg "    into" '~expanded-lhs))
        (alter-meta! f# merge {:lhs '~lhs :rhs '~rhs :doc ~(apply str doc) :salience ~salience})
        (swap! *net* update-in [:productions] conj f#)
        f#)))
@@ -196,7 +196,7 @@
     (let [args (ordered-vars c)
           src `(fn [~@args & [~'*matches*]] ~c)
           meta (meta c)]
-      (debug " compiling" c)
+      (dbg " compiling" c)
       (binding [*ns* (or (:ns meta) *ns*)]
         (with-meta (eval src) (merge meta {:src c :args args :uses-*matches* (uses-*matches*? c)}))))))
 
@@ -208,12 +208,12 @@
   (let [predicate (predicate-for c)]
     (try
       (when-let [result (predicate wme)]
-        (debug " evaluated to true" wme)
+        (dbg " evaluated to true" wme)
         (merge
          {'?1 wme}
          (when (matcher? c) (alias-match-vars result))))
       (catch RuntimeException e
-        (debug " threw non fatal" e)))))
+        (dbg " threw non fatal" e)))))
 
 (defn match-triplet [c wme]
   (loop [[v & vs] wme [t & ts] c m {}]
@@ -223,7 +223,7 @@
         is-var? (recur vs ts (assoc m t v))
         nil)
       (do
-        (debug " evaluated to true" wme)
+        (dbg " evaluated to true" wme)
         m))))
 
 (defn predicate? [c]
@@ -246,7 +246,7 @@
 
 (defn multi-var-predicate-placeholder [c]
   (let [pred (predicate-for c)]
-    (debug " more than one argument, needs beta network")
+    (dbg " more than one argument, needs beta network")
     (with-meta (zipmap (-> pred meta :args) (repeat pred))
       (assoc (meta pred) :pred pred))))
 
@@ -257,12 +257,12 @@
 
 (defn ^:private wm-crud [action test msg fact]
   (when (test (working-memory) fact)
-    (debug msg " fact" fact)
+    (dbg msg " fact" fact)
     (swap! *net* update-in [:working-memory] action fact)
     (doseq [c (keys (:alpha-network @*net*))
             :let [match (match-wme c fact)]
             :when match]
-      (debug " alpha network change" match)
+      (dbg " alpha network change" match)
       (swap! *net* update-in [:alpha-network] #(merge-with action % {c match}))))
   fact)
 
@@ -295,7 +295,7 @@
 (defn matching-wmes
   ([c] (matching-wmes c (working-memory) false))
   ([c wm needs-beta?]
-     (debug "condition" c)
+     (dbg "condition" c)
      (if (or ((some-fn multi-var-predicate? binding?) c)
              needs-beta?)
        #{(multi-var-predicate-placeholder c)}
@@ -317,7 +317,7 @@
             (map #(rename-keys (with-meta % (merge (meta %) (postwalk-replace vars-by-index (meta %)))) vars-by-index))))))
 
 (defn cross [left right]
-  (debug " nothing to join on, treating as or")
+  (dbg " nothing to join on, treating as or")
   (set
    (for [x left y right]
      (merge x y))))
@@ -368,12 +368,12 @@
                                              (when bind-var
                                                {bind-var r})))
                                     (catch RuntimeException e
-                                      (debug " threw non fatal" e)))))
+                                      (dbg " threw non fatal" e)))))
                          (r/remove nil?))))]
-    (debug " multi-var-predicate")
-    (debug " args" args)
-    (debug " known args" join-on "- need to find" needed-args)
-    (debug " permutations of wm" (ellipsis permutated-wm))
+    (dbg " multi-var-predicate")
+    (dbg " args" args)
+    (dbg " known args" join-on "- need to find" needed-args)
+    (dbg " permutations of wm" (ellipsis permutated-wm))
     (->> c1-am
          (r/mapcat join-fn)
          (fold-into vector))))
@@ -382,16 +382,16 @@
   (let [c2-am (alpha-memory c2 wm (some binding-vars (vars c2)))]
     (with-cache beta-join-nodes [c1-am c2-am]
       (let [join-on (join-on (-> c1-am first keys) c2)]
-        (debug "join" join-on)
-        (debug "  left" (ellipsis c1-am))
-        (debug " right" (ellipsis c2-am))
+        (dbg "join" join-on)
+        (dbg "  left" (ellipsis c1-am))
+        (dbg " right" (ellipsis c2-am))
         (let [result (cond
                       (multi-var-predicate-node? c2-am) (deal-with-multi-var-predicates
                                                           c1-am c2-am
                                                           join-on c2 binding-vars)
                       (empty? join-on) (cross c1-am c2-am)
                       :else (join c1-am c2-am))]
-          (debug "result" (ellipsis result))
+          (dbg "result" (ellipsis result))
           result)))))
 
 (defn order-conditions [cs]
@@ -400,7 +400,7 @@
           (partition-by binding? cs)))
 
 (defn check-rule [cs wm args]
-  (debug "conditions" cs)
+  (dbg "conditions" cs)
   (let [binding-vars (binding-vars-for-rule cs)]
     (loop [[c & cs] (order-conditions cs)
            matches #{args}]
@@ -518,12 +518,12 @@
   ([m] `(constraint (constrained-match ~m ~'*matches*)))
   ([x m]`(constraint (constrained-match ~m ~x))))
 
-;(defn -main [& args]
-;  (println)
-;  (println "Welcome to Mímir |" (version) "| Copyright © 2012-13 Håkan Råberg")
-;  (println)
-;  (require 'clojure.main)
-;  (clojure.main/repl :init #(in-ns 'mimir.well)))
+(defn -main [& args]
+  (println)
+  (println "Welcome to Mímir"); |" (version) "| Copyright © 2012-13 Håkan Råberg")
+  (println)
+  (require 'clojure.main)
+  (clojure.main/repl :init #(in-ns 'mimir.well)))
 
 
 (defn -dbg
@@ -535,15 +535,18 @@
   "A Java-callable wrapper around the 'facts' function."
   [this hechos]
   
-  (println (apply str(facts hechos)))
+  (println (apply str (facts hechos)))
   )
+
+(defn manotazo [nombre argumentos]
+  (eval `(rule ~nombre ~@argumentos)))
 
 (defn -addrule
   [this nombre laregla]
-  (rule nombre (read-string laregla))
- 
+  (let [argumentos (map symbol (clojure.string/split laregla #" " ))]
+    (manotazo (symbol nombre) argumentos))
  )
- 
+
  (defn -run
   [this]
   (println (apply str(run)))
@@ -553,11 +556,4 @@
 ; And finally, the server itself
 (defn -init [this]
 
-
- 
-
-		
-	
-  
-  
  )
