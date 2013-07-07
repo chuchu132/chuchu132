@@ -46,7 +46,7 @@ public class InferEngine extends well {
 			BufferedReader br = new BufferedReader(new InputStreamReader(in));
 			String strLine;
 			while ((strLine = br.readLine()) != null) {
-				addfacts(strLine.trim());
+				addfact(strLine.trim());
 			}
 			in.close();
 		} catch (Exception e) {
