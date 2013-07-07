@@ -11,7 +11,7 @@
   (:refer-clojure :exclude [assert])
   (:gen-class
     :name mimir.well
-	:methods [ [dbg [String] void] [addfacts [String] void] [addrule [String String] void] [run [] void] [reset [] void] [init [] void]]))
+	:methods [ [dbg [String] void] [addfact [String] void] [addrule [String String] void] [run [] void] [reset [] void] [init [] void]]))
 
 (defn create-net []
   {:productions #{}
@@ -421,7 +421,8 @@
           ;; (r/mapcat #(% wm {}))
           ;; (fold-into vector)
           (mapcat #(% wm {}))
-          doall)))
+          doall))
+		  )
 
 (defn run*
   ([] (repeatedly run-once)))
@@ -530,7 +531,7 @@
   [this x]
   (dbg x))
 
-(defn -addfacts
+(defn -addfact
   "A Java-callable wrapper around the 'facts' function."
   [this hechos]
   
@@ -555,7 +556,7 @@
  (defn -run
   [this]
   ;;Hay que hacer que esto imprima el vector que devuelve run pero no se donde lo deja o carajo hace
-  (println (apply str(run)))
+  (println (apply str(eval `(run))))
  )
 
   
