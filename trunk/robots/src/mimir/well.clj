@@ -11,7 +11,7 @@
   (:refer-clojure :exclude [assert])
   (:gen-class
     :name mimir.well
-	:methods [ [dbg [String] void] [addfacts [String] void] [addrule [String String] void] [run [] void] [init [] void]]))
+	:methods [ [dbg [String] void] [addfacts [String] void] [addrule [String String] void] [run [] void] [reset [] void] [init [] void]]))
 
 (defn create-net []
   {:productions #{}
@@ -24,7 +24,9 @@
 
 (def ^:dynamic *net* (atom (create-net)))
 
-(defn dbg [& x] (println x) x)
+(defn dbg [& x] 
+(println x) x
+)
 
 
  (doseq [k (keys @*net*)]
@@ -519,11 +521,8 @@
   ([x m]`(constraint (constrained-match ~m ~x))))
 
 (defn -main [& args]
-  (println)
-  (println "Welcome to Mímir"); |" (version) "| Copyright © 2012-13 Håkan Råberg")
-  (println)
-  (require 'clojure.main)
-  (clojure.main/repl :init #(in-ns 'mimir.well)))
+  
+ )
 
 
 (defn -dbg
@@ -547,8 +546,15 @@
     (manotazo (symbol nombre) argumentos))
  )
 
+ 
+(defn -reset
+  [this]
+  (println (apply str(reset)))
+ )
+ 
  (defn -run
   [this]
+  ;;Hay que hacer que esto imprima el vector que devuelve run pero no se donde lo deja o carajo hace
   (println (apply str(run)))
  )
 
@@ -557,3 +563,4 @@
 (defn -init [this]
 
  )
+ 
