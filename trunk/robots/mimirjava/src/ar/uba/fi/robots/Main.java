@@ -25,6 +25,7 @@ public class Main {
             InferEngine w = InferEngine.getInstance();
             w.addFactsFromFile(R.get("-facts"));
             w.addFactsFromFile(R.get("-rules"));
+            System.out.println("Resultados:");
             w.run();
         }
         else { 
