@@ -4,6 +4,7 @@
         [clojure.walk :only (postwalk postwalk-replace)]
         [clostache.parser]
 		[compojure.core]
+
         [mimir.match :only (filter-walk maybe-singleton-coll match match* all-vars *match-var?* default-match-var?)]		
 		)
   (:require [clojure.core.reducers :as r] 
@@ -20,12 +21,15 @@
    :predicate-invokers {}
    :expression-cache {}
    :alpha-network {}
-   :beta-join-nodes {}})
+   :beta-join-nodes {}
+   }
+   
+   )
 
 (def ^:dynamic *net* (atom (create-net)))
 
 (defn dbg [& x] 
-(println x) x
+;(println x) x
 )
 
 
@@ -416,12 +420,13 @@
 (defn run-once
   ([] (run-once (working-memory) (productions)))
   ([wm productions]
-     (->> productions (sort-by salience) vec
-          ;; This is not thread safe.
-          ;; (r/mapcat #(% wm {}))
-          ;; (fold-into vector)
-          (mapcat #(% wm {}))
-          doall))
+     (->> productions 
+		 (sort-by salience) 
+		  vec
+         (mapcat #(% wm {}))
+          doall)
+		  
+		  )
 		  )
 
 (defn run*
@@ -433,7 +438,7 @@
      (binding [*net* net]
        (loop [wm (working-memory)
               productions (:productions @net)
-              acc #{}]
+              acc {}]
          (let [acc (union (set (run-once wm productions)) acc)]
            (if (seq (difference (working-memory) wm))
              (recur (working-memory) productions acc)
@@ -521,11 +526,6 @@
   ([m] `(constraint (constrained-match ~m ~'*matches*)))
   ([x m]`(constraint (constrained-match ~m ~x))))
 
-(defn -main [& args]
-  
- )
-
-
 (defn -dbg
   "A Java-callable wrapper around the 'dbg' function."
   [this x]
@@ -534,10 +534,10 @@
 (defn -addfact
   "A Java-callable wrapper around the 'facts' function."
   [this hechos]
+  (println  (fact (map symbol (clojure.string/split hechos #" " ))))
   
-  (println (apply str (facts hechos)))
-  )
-
+  ) 
+  
 (defn manotazo [nombre argumentos]
   (eval `(rule ~nombre ~@argumentos)))
 
@@ -556,9 +556,21 @@
  (defn -run
   [this]
   ;;Hay que hacer que esto imprima el vector que devuelve run pero no se donde lo deja o carajo hace
-  (println (apply str(eval `(run))))
+  ;(println (apply str(eval `(run))))
+  
+  (println (map #(str %) (run)))
+  (println (apply str (map #(str %) (run))))
+  (println (with-out-str (print (run))))
+
  )
 
+ (defn -main [& args]
+
+ ;(require 'clojure.main)
+ ;(clojure.main/repl :init #(in-ns 'mimir.well))
+ )
+
+ 
   
 ; And finally, the server itself
 (defn -init [this]
