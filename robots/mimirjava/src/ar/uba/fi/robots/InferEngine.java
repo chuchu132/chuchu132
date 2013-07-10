@@ -30,12 +30,12 @@ public class InferEngine extends well {
 					String[] rule = strLine.split(",");
 					addrule(rule[0].trim(), rule[1].trim());
 				} catch (Exception e) {
-					System.err.println("Regla mal escrita: " + strLine);
+					System.out.println("Regla mal escrita: " + strLine);
 				}
 			}
 			in.close();
 		} catch (Exception e) {
-			System.err.println("Error: " + e.getMessage());
+			System.out.println("Error: " + e.getMessage());
 		}
 	}
 	
@@ -50,7 +50,7 @@ public class InferEngine extends well {
 			}
 			in.close();
 		} catch (Exception e) {
-			System.err.println("Error: " + e.getMessage());
+			System.out.println("Error: " + e.getMessage());
 		}
 	}
 
