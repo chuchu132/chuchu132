@@ -12,7 +12,7 @@
   (:refer-clojure :exclude [assert])
   (:gen-class
     :name mimir.well
-	:methods [ [dbg [String] void] [addfact [String] void] [addrule [String String] void] [run [] void] [reset [] void] [init [] void]]))
+	:methods [ [dbg [String] void] [addfact [String] void] [addrule [String String] void] [run [] String] [reset [] void] [init [] void]]))
 
 (defn create-net []
   {:productions #{}
@@ -557,10 +557,9 @@
   [this]
   ;;Hay que hacer que esto imprima el vector que devuelve run pero no se donde lo deja o carajo hace
   ;(println (apply str(eval `(run))))
+  (with-out-str (print ((vec run))))
   
-  (println (map #(str %) (run)))
-  (println (apply str (map #(str %) (run))))
-  (println (with-out-str (print (run))))
+  ; (clojure.string/join " " (map pr-str (first (run))))
 
  )
 
