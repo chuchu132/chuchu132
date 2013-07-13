@@ -1,0 +1,15 @@
+Motor de Inferencia Basado en Mimir:
+Para ejecutar el programa:
+
+$ java -jar Infer.jar -facts URL_FACTS_FILE -rules URL_RULES_FILE
+
+Las reglas hay que escribirlas como: NOMBRE,REGLA una por linea.
+El archivo con casos de prueba debe tener el siguiente formato:
+#NOMBRE DEL CASO o Linea en Blanco
+Hecho
+Hecho
+Hecho
+Hecho
+
+Para mas información sobre el formato y forma de redactar hechos y reglas ver:
+https://github.com/hraberg/mimir/blob/master/README.md
