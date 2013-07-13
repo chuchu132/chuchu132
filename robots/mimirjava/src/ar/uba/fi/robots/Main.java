@@ -19,13 +19,13 @@ public class Main {
 
 		Map<String, String> R = new HashMap<String, String>();
 		String parseError = cmd.validate(args);
-		if (!cmd.isValid(args)) {
+		if (cmd.isValid(args)) {
 			R = cmd.parse(args);
 			InferEngine w = InferEngine.getInstance();
-//			w.addFactsFromFile(R.get("-facts"));
-//			w.addRulesFromFile(R.get("-rules"));
-			w.addFactsFromFile("C:\\Users\\Ale\\Desktop\\facts.txt");
-			w.addRulesFromFile("C:\\Users\\Ale\\Desktop\\rules.txt");
+			w.addFactsFromFile(R.get("-facts"));
+			w.addRulesFromFile(R.get("-rules"));
+		/*	w.addFactsFromFile("C:\\Users\\Ale\\Desktop\\facts.txt");
+			w.addRulesFromFile("C:\\Users\\Ale\\Desktop\\rules.txt");*/
 			w.runCases();
 			
 		} else {
