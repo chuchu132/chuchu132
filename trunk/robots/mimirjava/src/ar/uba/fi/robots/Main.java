@@ -19,14 +19,15 @@ public class Main {
 
 		Map<String, String> R = new HashMap<String, String>();
 		String parseError = cmd.validate(args);
-		if (cmd.isValid(args)) {
+		if (!cmd.isValid(args)) {
 			R = cmd.parse(args);
 			InferEngine w = InferEngine.getInstance();
-			w.addFactsFromFile(R.get("-facts"));
-			w.addRulesFromFile(R.get("-rules"));
-			System.out.println("Resultados:");
-			String s = w.run();
-			System.out.println(s);
+//			w.addFactsFromFile(R.get("-facts"));
+//			w.addRulesFromFile(R.get("-rules"));
+			w.addFactsFromFile("C:\\Users\\Ale\\Desktop\\facts.txt");
+			w.addRulesFromFile("C:\\Users\\Ale\\Desktop\\rules.txt");
+			w.runCases();
+			
 		} else {
 			System.out.println(parseError);
 			System.exit(1);

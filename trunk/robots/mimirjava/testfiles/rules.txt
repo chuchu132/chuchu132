@@ -1,1 +1,10 @@
-find-stack-of-two-blocks-to-the-left-of-a-red-block,?x on ?y ?y left-of ?z ?z color red => ?x is on-top
+mezcla-prohibida-1,?z es mezcla ?x es mal ?y es bon => ?z no-es mezcla
+mezcla-prohibida-2,?z es mezcla ?x es bon ?y es cab => ?z no-es mezcla
+mezcla-prohibida-3,?z es mezcla ?x es mal ?y es mer => ?z no-es mezcla
+mezcla-prohibida-4,?z es mezcla ?x es mer ?y es bon => ?z no-es mezcla
+mezcla-prohibida-5,?z es mezcla ?x es mer ?y es san => ?z no-es mezcla
+mezcla-prohibida-6,?z es mezcla ?x es mer ?y es pet => ?z no-es mezcla
+mezcla-prohibida-7,?z es mezcla ?x es pet ?y es bon => ?z no-es mezcla
+mezcla-prohibida-8,?z es mezcla ?x es cab ?y es car=> ?z no-es mezcla
+mezcla-prohibida-9,?z es mezcla ?x es syr ?y es san => ?z no-es mezcla
+mezcla-prohibida-10,?z es mezcla ?x es san ?y es bon => ?z no-es mezcla

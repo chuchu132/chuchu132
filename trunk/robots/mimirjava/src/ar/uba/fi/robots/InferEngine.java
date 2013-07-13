@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 
 import mimir.well;
 
@@ -11,6 +12,9 @@ public class InferEngine extends well {
 
 	private static InferEngine instance = new InferEngine();
 
+	private ArrayList<Rule> rules =  new ArrayList<Rule>();
+	private ArrayList<FactsSet> facts =  new ArrayList<FactsSet>();
+	
 	private InferEngine() {
 
 	}
@@ -27,10 +31,10 @@ public class InferEngine extends well {
 			String strLine;
 			while ((strLine = br.readLine()) != null) {
 				try {
-					String[] rule = strLine.split(",");
-					addrule(rule[0].trim(), rule[1].trim());
+					rules.add(new Rule(strLine));
 				} catch (Exception e) {
-					System.out.println("Regla mal escrita: " + strLine);
+					e.printStackTrace();
+					System.out.println("Error: " + strLine);
 				}
 			}
 			in.close();
@@ -45,12 +49,62 @@ public class InferEngine extends well {
 			DataInputStream in = new DataInputStream(fstream);
 			BufferedReader br = new BufferedReader(new InputStreamReader(in));
 			String strLine;
+			FactsSet tempFact = null;
 			while ((strLine = br.readLine()) != null) {
-				addfact(strLine.trim());
+				if(strLine.trim().length() == 0 || strLine.startsWith("#")){
+					if(tempFact != null){
+						facts.add(tempFact);
+					}
+					tempFact =  new FactsSet();
+					tempFact.setname = strLine.trim();
+				}else if( tempFact != null ){
+					tempFact.facts.add(strLine.trim());
+				}
 			}
+			if(tempFact != null)
+				facts.add(tempFact);
 			in.close();
 		} catch (Exception e) {
 			System.out.println("Error: " + e.getMessage());
+		}
+	}
+	
+	
+	private void loadRules(){
+		for(Rule rule : rules){
+			try{
+				addrule(rule.name, rule.rule);
+			}catch(Exception e){
+				System.out.println("Regla mal escrita : "+ rule.name);
+			}
+		}
+	}
+	
+	private void loadFacts(FactsSet f){
+		for(String fact : f.facts){
+			try{
+				addfact(fact);
+			}catch(Exception e){
+				System.out.println("Error cargando: "+ fact);
+			}
+		}
+	}
+	
+	public void runCases(){
+		if(rules.size() == 0){
+			System.out.println("No hay reglas definidas.");
+			return;
+		}
+		if(facts.size() == 0){
+			System.out.println("No hay hechos cargados.");
+			return;
+		}
+		for(FactsSet tempFacts : facts){
+			reset();
+			loadRules();
+			loadFacts(tempFacts);
+			String s = run();
+			System.out.println(((tempFacts.setname.length() != 0)?tempFacts.setname:"CasoSinNombre") +": "+((s.trim().equals("#{}"))?"":"no ")+"es una mezcla válida." );
 		}
 	}
 
